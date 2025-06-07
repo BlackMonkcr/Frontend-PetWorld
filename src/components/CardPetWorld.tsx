@@ -1,4 +1,5 @@
 import { Heart, Shield, UtensilsCrossed, Zap } from "lucide-react";
+import { useState } from "react";
 
 interface StatsBarProps {
   color: string;
@@ -7,7 +8,7 @@ interface StatsBarProps {
   maxValue: number;
 }
 
-function StatsBar(props: StatsBarProps) {
+function StatsBar(props: Readonly<StatsBarProps>) {
   const { color, icon, currentValue, maxValue } = props;
 
   return (
@@ -41,9 +42,10 @@ interface CardPetWorldProps {
     id: number;
     username: string;
   };
+  borderColor?: string;
 }
 
-function CardPetWorld(props: CardPetWorldProps) {
+function CardPetWorld(props: Readonly<CardPetWorldProps>) {
   const getColor = (type: string) => {
     if (type === "hunger") return "#4caf50";
     else if (type === "happiness") return "#ff36cb";
@@ -52,12 +54,36 @@ function CardPetWorld(props: CardPetWorldProps) {
     return "#9e9e9e"; // Default color if type is unknown
   };
 
+  const getHexColorRandom = () => {
+    const color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+    return color;
+  };
+
+  const [cont, setCont] = useState<number>(0);
+  const [color, setColor] = useState<string>(getHexColorRandom());
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
+  const toggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+  };
+
+  console.log("CardPetWorld props:", props);
+
   return (
-    <div className="bg-orange-300 rounded-xl w-[300px] h-[450px] border-4 border-orange-400 pt-6 pb-6">
-      <div className="bg-orange-100 border-t-2 border-b-2 border-orange-400 h-full w-full px-4 py-4 text-amber-800 flex flex-col gap-4">
+    <div
+      className="bg-orange-300 rounded-xl w-[300px] h-fit border-4 pt-6 pb-6"
+      style={{ borderColor: props.borderColor ?? "orange" }}
+    >
+      <div
+        className={`bg-orange-100 border-t-2 border-b-2  h-full w-full px-4 py-4 text-amber-800 flex flex-col gap-4`}
+        style={{ borderColor: props.borderColor ?? "orange" }}
+      >
         <div className="flex flex-row justify-between items-center">
           <h2 className="font-bold text-2xl">{props.name}</h2>
-          <div className="rounded-full bg-orange-500 px-3 py-1 text-lg font-bold text-white text-center">
+          <div
+            className={`rounded-full px-3 py-1 text-lg font-bold text-white text-center`}
+            style={{ backgroundColor: color }}
+          >
             {props.type}
           </div>
         </div>
@@ -90,6 +116,14 @@ function CardPetWorld(props: CardPetWorldProps) {
             icon={<UtensilsCrossed color={getColor("hunger")} size={20} />}
             currentValue={props.hunger}
             maxValue={100}
+          />
+        </div>
+        <div>
+          <Heart
+            color="red"
+            fill={isFavorite ? "red" : "none"}
+            onClick={toggleFavorite}
+            className="cursor-pointer transition-colors duration-300"
           />
         </div>
       </div>
